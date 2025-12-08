@@ -1,3 +1,4 @@
+const config = require("./config/dbconfig")
 const express = require('express')
 const cors = require('cors')
 const app = express()
