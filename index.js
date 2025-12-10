@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/dbconfig");
 
 const authRoutes = require("./routes/authRoutes");
+const courseRoutes = require("./routes/courseRoutes");
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 
 app.use("/auth", authRoutes);
+app.use("/courses", courseRoutes);
 
 app.get("/", (req, res) => {
     res.send("Course Management API Running...");

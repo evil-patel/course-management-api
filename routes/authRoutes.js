@@ -1,13 +1,16 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+
 const User = require("../models/user");
+const auth = require("../middleware/auth");
+const roleCheck = require("../middleware/roleCheck");
 
 const router = express.Router();
 
-// SIGNUP
+// STUDENT SIGNUP (Public)
 router.post("/signup", async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     const hashed = await bcrypt.hash(password, 10);
 
@@ -16,7 +19,6 @@ router.post("/signup", async (req, res) => {
             name,
             email,
             password: hashed,
-            role
         });
 
         res.json({ message: "Signup successful", user: newUser });
@@ -26,7 +28,8 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// LOGIN
+// LOGIN (Public)
+
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
@@ -48,5 +51,29 @@ router.post("/login", async (req, res) => {
 
     res.json({ message: "Login successful", token });
 });
+
+
+//ADMIN => CREATE TEACHER or ADMIN
+
+router.post("/create-user", auth, roleCheck("admin"), async (req, res) => {
+    const { name, email, password, role } = req.body;
+
+    const hashed = await bcrypt.hash(password, 10);
+
+    try {
+        const newUser = await User.create({
+            name,
+            email,
+            password: hashed,
+            role
+        });
+
+        res.json({ message: "User created by admin", user: newUser });
+    }
+    catch (err) {
+        res.status(500).json({ message: err.message })
+    }
+})
+
 
 module.exports = router;
