@@ -6,7 +6,9 @@ const courseSchema = new mongoose.Schema({
     category: String,
     teacher: String,
     price: Number,
+    thumbnail: String,
+    file: String,
     createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("course",courseSchema);
+module.exports = mongoose.model("course", courseSchema);

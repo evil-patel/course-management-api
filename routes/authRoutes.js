@@ -8,7 +8,7 @@ const roleCheck = require("../middleware/roleCheck");
 
 const router = express.Router();
 
-// STUDENT SIGNUP (Public)
+// Public Signup (student)
 router.post("/signup", async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -19,6 +19,7 @@ router.post("/signup", async (req, res) => {
             name,
             email,
             password: hashed,
+            role: "student"
         });
 
         res.json({ message: "Signup successful", user: newUser });
@@ -28,23 +29,19 @@ router.post("/signup", async (req, res) => {
     }
 });
 
-// LOGIN (Public)
 
+// Login
 router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
-    const foundUser = await User.findOne({ email });
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
 
-    if (!foundUser)
-        return res.status(400).json({ message: "User not found" });
-
-    const isMatch = await bcrypt.compare(password, foundUser.password);
-
-    if (!isMatch)
-        return res.status(400).json({ message: "Wrong password" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Wrong password" });
 
     const token = jwt.sign(
-        { id: foundUser._id, role: foundUser.role },
+        { id: user._id, role: user.role },
         process.env.SECRET_KEY,
         { expiresIn: "1d" }
     );
@@ -53,9 +50,8 @@ router.post("/login", async (req, res) => {
 });
 
 
-//ADMIN => CREATE TEACHER or ADMIN
-
-router.post("/create-user", auth, roleCheck("admin"), async (req, res) => {
+// Admin create teacher/admin
+router.post("/create-user", auth, roleCheck(["admin"]), async (req, res) => {
     const { name, email, password, role } = req.body;
 
     const hashed = await bcrypt.hash(password, 10);
@@ -73,7 +69,6 @@ router.post("/create-user", auth, roleCheck("admin"), async (req, res) => {
     catch (err) {
         res.status(500).json({ message: err.message })
     }
-})
-
+});
 
 module.exports = router;
