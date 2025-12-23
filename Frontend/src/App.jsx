@@ -1,15 +1,20 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Login from "./pages/Login";
+import Courses from "./pages/Courses";
+import CreateCourse from "./pages/CreateCourse";
+import UploadCourse from "./pages/UploadCourse";
 
-function App() {
-
+export default function App() {
   return (
     <>
-      <div className='text-2xl text-green-500'>manthan</div>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/create-course" element={<CreateCourse />} />
+        <Route path="/uploads" element={<UploadCourse />} />
+      </Routes>
     </>
-  )
+  );
 }
-
-export default App
